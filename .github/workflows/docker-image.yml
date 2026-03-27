@@ -1,4 +1,4 @@
-name: Build & Push Watermark Vault Docker Image
+name: Build & Push Zphotosite
 
 on:
   push:
