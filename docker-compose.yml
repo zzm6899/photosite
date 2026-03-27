@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  zacmorgan-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zacmorgan-photography
+    ports:
+      - "8080:8080"      # Access at http://localhost:8080
+    volumes:
+      # Mount images folder for easy updates without rebuilding
+      - ./images:/usr/share/nginx/html/images:ro
+      # Mount css/js for live editing during development
+      - ./css:/usr/share/nginx/html/css:ro
+      - ./js:/usr/share/nginx/html/js:ro
+    restart: unless-stopped
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=8080
+    labels:
+      - "com.zacmorgan.site=photography"
+      - "com.zacmorgan.version=1.0"
