@@ -222,12 +222,9 @@ const templates = {
       <section class="section narrow page-intro">
         <p class="eyebrow">Zac Morgan Photography</p>
         ${editable("portfolio.title", "My Portfolio", "h1")}
-        ${editable("portfolio.sub", "What have I done", "h3")}
-        ${editable("portfolio.body1", "Over the past year, I have had the privilege of working as a contracted photographer for several prominent businesses, including Asahi Breweries, Navarra Venues, and SMASH!, among others. My approach to photography is rooted in authenticity, as I prioritize capturing natural, true-to-life moments without the use of filters or excessive post-processing.", "p")}
-        ${editable("portfolio.body2", "Through these collaborations, I have developed a deep understanding of client needs, ensuring their satisfaction and consistently delivering work that exceeds expectations.", "p")}
-        ${editable("portfolio.body3", "Below are some of my works (mixed), ranging from weddings, corporate event shoots, parties, and individual shoots (personal / cosplay).", "p")}
-        ${editable("portfolio.body4", "Explore more of my work on Instagram @zacmphotos for more landscape / personal shoots", "p")}
-        <p>For business portfolio - <a href="/events/" data-link>click me</a></p>
+        ${editable("portfolio.sub", "Weddings, events, parties, portraits, and brand stories captured with natural light, honest colour, and clean composition.", "h3")}
+        ${editable("portfolio.body1", "A mixed selection of client work across weddings, corporate events, hospitality, live music, personal shoots, and social content.", "p")}
+        <a class="button-link" href="/events/" data-link>View business portfolio</a>
       </section>
       ${gallery("portfolio")}
       <section class="section narrow dark-band">
@@ -245,10 +242,8 @@ const templates = {
       </section>
       <section class="section narrow page-intro">
         <p class="eyebrow">Branding / Events</p>
-        ${editable("events.intro1", "Let’s capture the essence of your brand together", "p")}
-        ${editable("events.intro2", "Moments that define your business, crafted into powerful visual stories", "h2")}
-        ${editable("events.body1", "When your hosting an event, launching a product, or showcasing your business, every detail matters. These are not just ordinary moments - they are opportunities to leave a lasting impression.", "p")}
-        ${editable("events.body2", "I capture not just the people and places but the energy, atmosphere and essence of your brand. Whether its a corporate gala, a product launch or a networking event, my goal is to deliver visuals that tell that unique story.", "p")}
+        ${editable("events.intro2", "Brand moments with atmosphere, detail, and intent.", "h2")}
+        ${editable("events.body1", "Corporate events, launches, hospitality activations, and formal celebrations photographed with a clean editorial eye.", "p")}
       </section>
       ${gallery("events")}
       <section class="section narrow">
