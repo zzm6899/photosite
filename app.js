@@ -176,10 +176,11 @@ function escapeHtml(value) {
 
 function imageHtml(ref, className = "image-tile", extra = "") {
   const data = resolveImage(ref);
+  const priority = className.includes("portfolio-cover") || className.includes("wide-image");
   return `
     <div class="${className} editable-image" data-image-ref="${ref}" data-lightbox-image="${data.src}" data-lightbox-alt="${escapeHtml(data.alt)}" ${extra}>
       <span class="image-edit-badge">Edit image</span>
-      <img src="${data.src}" alt="${escapeHtml(data.alt)}" style="--pos: ${data.position || "center"}" loading="lazy">
+      <img src="${data.src}" alt="${escapeHtml(data.alt)}" style="--pos: ${data.position || "center"}" loading="${priority ? "eager" : "lazy"}" decoding="async">
       <span class="image-view-label">View</span>
     </div>
   `;
@@ -219,12 +220,26 @@ const templates = {
   `,
   portfolio: () => `
     <article class="page">
-      <section class="section narrow page-intro">
-        <p class="eyebrow">Zac Morgan Photography</p>
-        ${editable("portfolio.title", "My Portfolio", "h1")}
-        ${editable("portfolio.sub", "Weddings, events, parties, portraits, and brand stories captured with natural light, honest colour, and clean composition.", "h3")}
-        ${editable("portfolio.body1", "A mixed selection of client work across weddings, corporate events, hospitality, live music, personal shoots, and social content.", "p")}
-        <a class="button-link" href="/events/" data-link>View business portfolio</a>
+      <section class="portfolio-showcase">
+        <div class="portfolio-copy">
+          <p class="eyebrow">Zac Morgan Photography</p>
+          ${editable("portfolio.title", "Portfolio", "h1")}
+          ${editable("portfolio.sub", "Editorial event, wedding, hospitality, and portrait photography with a natural finish and a polished commercial eye.", "h3")}
+          ${editable("portfolio.body1", "A curated selection of commissioned work, built around atmosphere, detail, movement, and honest colour.", "p")}
+          <div class="button-row">
+            <a class="button-link" href="/contact/" data-link>Book a shoot</a>
+            <a class="button-link secondary" href="/events/" data-link>Business portfolio</a>
+          </div>
+        </div>
+        <div class="portfolio-cover" aria-label="Featured portfolio images">
+          ${imageHtml("portfolio.0", "portfolio-cover-main")}
+          ${imageHtml("portfolio.1", "portfolio-cover-side top")}
+          ${imageHtml("portfolio.2", "portfolio-cover-side bottom")}
+        </div>
+      </section>
+      <section class="gallery-heading">
+        <p class="eyebrow">Selected Work</p>
+        ${editable("portfolio.galleryHeading", "Clean, vivid coverage across real moments and produced spaces.", "h2")}
       </section>
       ${gallery("portfolio")}
       <section class="section narrow dark-band">

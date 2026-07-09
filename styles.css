@@ -1,11 +1,12 @@
 :root {
-  --bg: #ffffff;
-  --ink: #24211f;
-  --muted: #746d68;
-  --line: #e4ded8;
-  --panel: #f8f5f1;
-  --accent: #8f7158;
-  --accent-dark: #4f3d30;
+  --bg: #fdfbf8;
+  --ink: #211e1b;
+  --muted: #746d66;
+  --line: #dfd7ce;
+  --panel: #f5f0ea;
+  --accent: #957357;
+  --accent-dark: #4a3528;
+  --charcoal: #171411;
   --max: 1240px;
   --gap: 18px;
   --columns: 3;
@@ -45,7 +46,7 @@ img {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(253, 251, 248, 0.95);
   border-bottom: 1px solid rgba(228, 222, 216, 0.82);
   backdrop-filter: blur(18px);
 }
@@ -82,6 +83,29 @@ img {
   justify-content: flex-end;
   gap: clamp(18px, 3vw, 42px);
   flex: 1;
+}
+
+.nav-links a {
+  position: relative;
+  padding: 8px 0;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 180ms ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a[aria-current="page"]::after {
+  transform: scaleX(1);
 }
 
 .brand-mark {
@@ -297,6 +321,11 @@ button,
   transition: background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
 
+.button-link.secondary {
+  border-color: var(--line);
+  color: var(--accent-dark);
+}
+
 .button-link:hover,
 button:hover,
 .import-button:hover {
@@ -317,10 +346,114 @@ button:hover,
   color: var(--ink);
 }
 
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
 .section {
   max-width: var(--max);
   margin: 0 auto;
   padding: 92px 32px;
+}
+
+.portfolio-showcase {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: clamp(56px, 7vw, 96px) 34px clamp(58px, 7vw, 92px);
+  display: grid;
+  grid-template-columns: minmax(320px, 0.86fr) minmax(0, 1.14fr);
+  gap: clamp(44px, 6vw, 88px);
+  align-items: center;
+}
+
+.portfolio-copy {
+  max-width: 560px;
+}
+
+.portfolio-copy h1 {
+  font-size: clamp(54px, 8vw, 112px);
+  margin-bottom: 18px;
+}
+
+.portfolio-copy h3 {
+  margin-bottom: 22px;
+  font-size: clamp(24px, 2.4vw, 35px);
+  color: var(--ink);
+}
+
+.portfolio-copy p:not(.eyebrow) {
+  max-width: 480px;
+  color: var(--muted);
+}
+
+.portfolio-cover {
+  position: relative;
+  min-height: clamp(560px, 62vw, 780px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 0.42fr);
+  gap: 16px;
+}
+
+.portfolio-cover-main,
+.portfolio-cover-side {
+  position: relative;
+  overflow: hidden;
+  background: var(--panel);
+  cursor: zoom-in;
+}
+
+.portfolio-cover-main {
+  min-height: 100%;
+}
+
+.portfolio-cover-side {
+  min-height: 0;
+}
+
+.portfolio-cover-main img,
+.portfolio-cover-side img {
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--pos, center);
+  transition: transform 700ms ease, filter 300ms ease;
+}
+
+.portfolio-cover-side.top {
+  margin-top: 52px;
+}
+
+.portfolio-cover-side.bottom {
+  margin-bottom: 52px;
+}
+
+.portfolio-cover-main:hover img,
+.portfolio-cover-side:hover img {
+  transform: scale(1.035);
+  filter: saturate(1.02) contrast(1.02);
+}
+
+.portfolio-cover::before {
+  content: "";
+  position: absolute;
+  inset: -22px 48px 42px -26px;
+  z-index: -1;
+  border: 1px solid var(--line);
+  background: rgba(245, 240, 234, 0.45);
+}
+
+.gallery-heading {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 32px 44px;
+  text-align: center;
+}
+
+.gallery-heading h2 {
+  margin-bottom: 0;
+  font-size: clamp(30px, 3.8vw, 54px);
 }
 
 .section.narrow {
@@ -380,9 +513,9 @@ button:hover,
 
 .masonry,
 .gallery-grid {
-  max-width: 1440px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px 104px;
+  padding: 0 28px 112px;
   columns: var(--columns);
   column-gap: clamp(10px, 1.4vw, var(--gap));
 }
@@ -400,7 +533,8 @@ button:hover,
 
 .image-tile {
   position: relative;
-  min-height: 360px;
+  min-height: 0;
+  aspect-ratio: 4 / 5;
   margin: 0 0 var(--gap);
   break-inside: avoid;
   overflow: hidden;
@@ -410,11 +544,11 @@ button:hover,
 }
 
 .image-tile.tall {
-  min-height: 600px;
+  aspect-ratio: 2 / 3;
 }
 
 .image-tile.wide {
-  min-height: 450px;
+  aspect-ratio: 3 / 2;
 }
 
 .image-tile img {
@@ -462,7 +596,9 @@ button:hover,
 }
 
 .image-tile:hover .image-view-label,
-.wide-image:hover .image-view-label {
+.wide-image:hover .image-view-label,
+.portfolio-cover-main:hover .image-view-label,
+.portfolio-cover-side:hover .image-view-label {
   opacity: 1;
   transform: translate(-50%, -50%);
 }
@@ -486,9 +622,11 @@ button:hover,
 }
 
 .dark-band {
-  background: #181614;
+  background: var(--charcoal);
   color: #fff;
   text-align: center;
+  max-width: none;
+  margin: 0;
 }
 
 .quote {
@@ -822,6 +960,29 @@ body.editing .editable-image .image-edit-badge {
     grid-template-columns: 1fr;
   }
 
+  .portfolio-showcase {
+    grid-template-columns: 1fr;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .portfolio-copy {
+    max-width: 760px;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .portfolio-copy p:not(.eyebrow),
+  .button-row {
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .portfolio-cover {
+    min-height: 620px;
+  }
+
   .feature-links,
   .radio-grid {
     grid-template-columns: 1fr 1fr;
@@ -861,6 +1022,30 @@ body.editing .editable-image .image-edit-badge {
     grid-template-columns: 1fr;
   }
 
+  .portfolio-showcase {
+    padding: 42px 16px 58px;
+  }
+
+  .portfolio-cover {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    gap: 12px;
+  }
+
+  .portfolio-cover-main,
+  .portfolio-cover-side {
+    min-height: 420px;
+  }
+
+  .portfolio-cover-side.top,
+  .portfolio-cover-side.bottom {
+    margin: 0;
+  }
+
+  .portfolio-cover::before {
+    display: none;
+  }
+
   .hero-card,
   .hero-card.small {
     min-height: 420px;
@@ -877,7 +1062,8 @@ body.editing .editable-image .image-edit-badge {
   .image-tile,
   .image-tile.tall,
   .image-tile.wide {
-    min-height: 430px;
+    min-height: 0;
+    aspect-ratio: 4 / 5;
   }
 
   .hero-copy {
