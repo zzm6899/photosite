@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zac Morgan Photography</title>
+    <meta
+      name="description"
+      content="Local editable mock of Zac Morgan Photography."
+    />
+    <link rel="stylesheet" href="/styles.css?v=3" />
+  </head>
+  <body>
+    <header class="site-header" data-header>
+      <nav class="nav-shell" aria-label="Main navigation">
+        <a href="/" data-link>Home</a>
+        <div class="nav-group">
+          <a href="/portfolio/" data-link>Portfolio</a>
+          <a class="sub-link" href="/events/" data-link>Branding / Events</a>
+        </div>
+        <a class="brand-mark" href="/" data-link aria-label="Zac Morgan Photography">
+          <img data-logo alt="Zac Morgan Photography logo" />
+        </a>
+        <a href="/testimonials/" data-link>Testimonials</a>
+        <a href="/contact/" data-link>Contact</a>
+      </nav>
+    </header>
+
+    <main id="app" tabindex="-1"></main>
+
+    <footer class="site-footer">
+      <a href="https://www.instagram.com/zacmphotos/" target="_blank" rel="noreferrer">@zacmphotos</a>
+      <nav aria-label="Footer navigation">
+        <a href="/" data-link>Home</a>
+        <a href="/portfolio/" data-link>Portfolio</a>
+        <a href="/events/" data-link>Branding / Events</a>
+        <a href="/testimonials/" data-link>Testimonials</a>
+        <a href="/contact/" data-link>Contact</a>
+      </nav>
+      <p>© 2026 Zac Morgan Photography</p>
+      <div class="social-row" aria-label="Social links">
+        <a href="https://www.instagram.com/zacmphotos/" target="_blank" rel="noreferrer">Instagram</a>
+        <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer">LinkedIn</a>
+      </div>
+    </footer>
+
+    <button class="edit-toggle" type="button" data-edit-toggle>Edit Site</button>
+    <aside class="editor-panel" data-editor aria-label="Site editor">
+      <div class="editor-heading">
+        <div>
+          <p>Local Editor</p>
+          <strong data-editor-page>Page</strong>
+        </div>
+        <button type="button" data-close-editor aria-label="Close editor">×</button>
+      </div>
+
+      <label>
+        Layout
+        <select data-layout-control="mode">
+          <option value="masonry">Masonry gallery</option>
+          <option value="grid">Even grid</option>
+          <option value="feature">Large feature</option>
+        </select>
+      </label>
+      <label>
+        Gallery columns
+        <input type="range" min="2" max="5" step="1" data-layout-control="columns" />
+      </label>
+      <label>
+        Image gap
+        <input type="range" min="4" max="28" step="2" data-layout-control="gap" />
+      </label>
+      <label>
+        Hero height
+        <input type="range" min="280" max="760" step="20" data-layout-control="heroHeight" />
+      </label>
+
+      <hr />
+
+      <p class="editor-help">Click any image while editing to swap it, crop it, or change its alt text.</p>
+      <label>
+        Selected image URL
+        <input type="url" data-image-url placeholder="https://..." />
+      </label>
+      <label>
+        Upload replacement
+        <input type="file" accept="image/*" data-image-upload />
+      </label>
+      <label>
+        Crop position
+        <select data-image-position>
+          <option value="center">Center</option>
+          <option value="top">Top</option>
+          <option value="bottom">Bottom</option>
+          <option value="left">Left</option>
+          <option value="right">Right</option>
+        </select>
+      </label>
+      <label>
+        Alt text
+        <textarea rows="3" data-image-alt></textarea>
+      </label>
+
+      <div class="editor-actions">
+        <button type="button" data-export>Export JSON</button>
+        <label class="import-button">
+          Import JSON
+          <input type="file" accept="application/json" data-import hidden />
+        </label>
+        <button type="button" data-reset>Reset</button>
+      </div>
+    </aside>
+
+    <script src="/assets/site/assets.js?v=1"></script>
+    <script src="/app.js?v=4"></script>
+  </body>
+</html>
