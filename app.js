@@ -129,14 +129,21 @@ function render(page) {
   clearInterval(carouselTimer);
   applyPageSettings();
   document.title = page === "home" ? "Zac Morgan Photography" : `${title(page)} - Zac Morgan Photography`;
+  document.body.dataset.page = page;
   document.querySelectorAll("[data-link]").forEach((link) => {
-    link.toggleAttribute("aria-current", new URL(link.href).pathname === pageToPath(page));
+    const isCurrent = new URL(link.href).pathname === pageToPath(page);
+    if (isCurrent) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
   });
   app.innerHTML = templates[page]();
   app.focus({ preventScroll: true });
   hydrateEditableText();
   hydrateEditableImages();
   hydrateCarousel();
+  hydrateLightbox();
   syncEditor();
 }
 
@@ -170,9 +177,10 @@ function escapeHtml(value) {
 function imageHtml(ref, className = "image-tile", extra = "") {
   const data = resolveImage(ref);
   return `
-    <div class="${className} editable-image" data-image-ref="${ref}" ${extra}>
+    <div class="${className} editable-image" data-image-ref="${ref}" data-lightbox-image="${data.src}" data-lightbox-alt="${escapeHtml(data.alt)}" ${extra}>
       <span class="image-edit-badge">Edit image</span>
       <img src="${data.src}" alt="${escapeHtml(data.alt)}" style="--pos: ${data.position || "center"}" loading="lazy">
+      <span class="image-view-label">View</span>
     </div>
   `;
 }
@@ -211,7 +219,8 @@ const templates = {
   `,
   portfolio: () => `
     <article class="page">
-      <section class="section narrow">
+      <section class="section narrow page-intro">
+        <p class="eyebrow">Zac Morgan Photography</p>
         ${editable("portfolio.title", "My Portfolio", "h1")}
         ${editable("portfolio.sub", "What have I done", "h3")}
         ${editable("portfolio.body1", "Over the past year, I have had the privilege of working as a contracted photographer for several prominent businesses, including Asahi Breweries, Navarra Venues, and SMASH!, among others. My approach to photography is rooted in authenticity, as I prioritize capturing natural, true-to-life moments without the use of filters or excessive post-processing.", "p")}
@@ -234,7 +243,8 @@ const templates = {
         ${hero("events.1", "events.parties.title", "Parties", "events.parties.sub", "Let’s capture it together", "/contact/", "Connect", "small")}
         ${hero("events.2", "events.business.title", "Business", "events.business.sub", "Let’s capture it together", "/contact/", "Connect", "small")}
       </section>
-      <section class="section narrow">
+      <section class="section narrow page-intro">
+        <p class="eyebrow">Branding / Events</p>
         ${editable("events.intro1", "Let’s capture the essence of your brand together", "p")}
         ${editable("events.intro2", "Moments that define your business, crafted into powerful visual stories", "h2")}
         ${editable("events.body1", "When your hosting an event, launching a product, or showcasing your business, every detail matters. These are not just ordinary moments - they are opportunities to leave a lasting impression.", "p")}
@@ -249,7 +259,8 @@ const templates = {
   `,
   testimonials: () => `
     <article class="page">
-      <section class="reviews">
+      <section class="reviews page-intro">
+        <p class="eyebrow">Testimonials</p>
         ${editable("testimonials.title", "Reviews from my Clients", "h1")}
         ${reviews.map((review, index) => `
           <div class="review">
@@ -402,6 +413,33 @@ function hydrateEditableImages() {
       event.preventDefault();
       event.stopPropagation();
       selectImage(node.dataset.imageRef);
+    });
+  });
+}
+
+function hydrateLightbox() {
+  document.querySelectorAll("[data-lightbox-image]").forEach((node) => {
+    node.addEventListener("click", (event) => {
+      if (editing) return;
+      event.preventDefault();
+      const src = node.dataset.lightboxImage;
+      const alt = node.dataset.lightboxAlt || "";
+      const lightbox = document.createElement("div");
+      lightbox.className = "lightbox";
+      lightbox.innerHTML = `
+        <button type="button" class="lightbox-close" aria-label="Close image">×</button>
+        <img src="${src}" alt="${escapeHtml(alt)}">
+      `;
+      const close = () => lightbox.remove();
+      lightbox.addEventListener("click", (clickEvent) => {
+        if (clickEvent.target === lightbox || clickEvent.target.closest(".lightbox-close")) close();
+      });
+      document.addEventListener("keydown", function onKeydown(keyEvent) {
+        if (keyEvent.key !== "Escape") return;
+        close();
+        document.removeEventListener("keydown", onKeydown);
+      });
+      document.body.appendChild(lightbox);
     });
   });
 }

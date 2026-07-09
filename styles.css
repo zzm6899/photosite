@@ -1,11 +1,12 @@
 :root {
   --bg: #ffffff;
   --ink: #24211f;
-  --muted: #77716d;
-  --line: #e8e2dc;
-  --panel: #f7f3ef;
-  --accent: #9d7f66;
-  --max: 1180px;
+  --muted: #746d68;
+  --line: #e4ded8;
+  --panel: #f8f5f1;
+  --accent: #8f7158;
+  --accent-dark: #4f3d30;
+  --max: 1240px;
   --gap: 18px;
   --columns: 3;
   --hero-height: 520px;
@@ -27,6 +28,7 @@ body {
   font-family: Montserrat, Arial, Helvetica, sans-serif;
   font-size: 15px;
   line-height: 1.75;
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -43,13 +45,13 @@ img {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(255, 255, 255, 0.93);
+  background: rgba(255, 255, 255, 0.96);
   border-bottom: 1px solid rgba(232, 226, 220, 0.72);
   backdrop-filter: blur(10px);
 }
 
 .nav-shell {
-  min-height: 116px;
+  min-height: 104px;
   max-width: var(--max);
   margin: 0 auto;
   padding: 18px 28px;
@@ -59,12 +61,14 @@ img {
   gap: 22px;
   text-align: center;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   font-size: 11px;
+  font-weight: 500;
 }
 
 .nav-shell a {
   opacity: 0.84;
+  transition: color 180ms ease, opacity 180ms ease;
 }
 
 .nav-shell a:hover,
@@ -85,16 +89,18 @@ img {
 
 .brand-mark {
   justify-self: center;
-  width: 94px;
-  height: 72px;
+  width: 112px;
+  height: 70px;
   display: grid;
   place-items: center;
 }
 
 .brand-mark img {
-  max-width: 94px;
-  max-height: 72px;
+  max-width: 108px;
+  max-height: 70px;
   object-fit: contain;
+  filter: invert(1) contrast(1.1);
+  opacity: 0.88;
 }
 
 main {
@@ -123,7 +129,7 @@ main {
 }
 
 .hero-carousel {
-  height: min(760px, calc(100vh - 116px));
+  height: min(780px, calc(100vh - 104px));
   min-height: 560px;
   background: #181614;
 }
@@ -164,7 +170,9 @@ main {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.45));
+  background:
+    radial-gradient(circle at center, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.32)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.54));
   z-index: -1;
 }
 
@@ -184,7 +192,7 @@ main {
 }
 
 .hero-carousel .hero-copy {
-  max-width: 900px;
+  max-width: 920px;
 }
 
 .carousel-button {
@@ -246,7 +254,7 @@ h3,
 
 h1 {
   margin: 0 0 12px;
-  font-size: clamp(38px, 6vw, 72px);
+  font-size: clamp(40px, 6vw, 76px);
 }
 
 h2 {
@@ -256,7 +264,8 @@ h2 {
 
 h3 {
   margin: 0 0 14px;
-  font-size: 25px;
+  font-size: 24px;
+  color: var(--accent-dark);
 }
 
 .eyebrow {
@@ -278,6 +287,15 @@ button,
   letter-spacing: 0.11em;
   font: 600 11px/1 Montserrat, Arial, sans-serif;
   cursor: pointer;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.button-link:hover,
+button:hover,
+.import-button:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
 }
 
 .hero-copy .button-link,
@@ -286,15 +304,32 @@ button,
   color: #fff;
 }
 
+.hero-copy .button-link:hover,
+.dark-band .button-link:hover {
+  background: #fff;
+  color: var(--ink);
+}
+
 .section {
   max-width: var(--max);
   margin: 0 auto;
-  padding: 86px 28px;
+  padding: 92px 32px;
 }
 
 .section.narrow {
-  max-width: 850px;
+  max-width: 880px;
   text-align: center;
+}
+
+.page-intro {
+  padding-top: 104px;
+  padding-bottom: 72px;
+}
+
+.page-intro p {
+  max-width: 780px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .split {
@@ -316,13 +351,19 @@ button,
   padding-top: 18px;
   font-family: Lora, Georgia, serif;
   font-size: 19px;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.feature-links a:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
 }
 
 .masonry,
 .gallery-grid {
   max-width: var(--max);
   margin: 0 auto;
-  padding: 0 28px 86px;
+  padding: 0 32px 96px;
   columns: var(--columns);
   column-gap: var(--gap);
 }
@@ -345,6 +386,8 @@ button,
   break-inside: avoid;
   overflow: hidden;
   background: var(--panel);
+  cursor: zoom-in;
+  box-shadow: 0 1px 0 rgba(36, 33, 31, 0.08);
 }
 
 .image-tile.tall {
@@ -358,11 +401,57 @@ button,
 .image-tile img {
   position: absolute;
   inset: 0;
+  transition: transform 700ms ease, filter 300ms ease;
+}
+
+.image-tile::after,
+.wide-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background 240ms ease;
+  pointer-events: none;
+}
+
+.image-tile:hover img,
+.wide-image:hover img {
+  transform: scale(1.035);
+  filter: saturate(1.02) contrast(1.02);
+}
+
+.image-tile:hover::after,
+.wide-image:hover::after {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.image-view-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  opacity: 0;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  color: #fff;
+  padding: 9px 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 10px;
+  transform: translate(-50%, -44%);
+  transition: opacity 200ms ease, transform 200ms ease;
+  pointer-events: none;
+}
+
+.image-tile:hover .image-view-label,
+.wide-image:hover .image-view-label {
+  opacity: 1;
+  transform: translate(-50%, -50%);
 }
 
 .events-top {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
 }
 
 .text-band {
@@ -374,7 +463,7 @@ button,
 .quote-shell {
   max-width: var(--max);
   margin: 0 auto;
-  padding: 76px 28px;
+  padding: 76px 32px;
 }
 
 .dark-band {
@@ -397,22 +486,25 @@ button,
 }
 
 .reviews {
-  max-width: 980px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 70px 28px 20px;
+  padding: 90px 32px 30px;
 }
 
 .review {
-  max-width: 840px;
-  margin: 0 auto 44px;
+  max-width: 900px;
+  margin: 0 auto 28px;
+  padding: 34px 36px;
   text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
 }
 
 .review blockquote {
   margin: 0;
   font-family: Lora, Georgia, serif;
-  font-size: clamp(20px, 2vw, 28px);
-  line-height: 1.55;
+  font-size: clamp(19px, 1.55vw, 24px);
+  line-height: 1.6;
 }
 
 .review cite {
@@ -427,12 +519,13 @@ button,
   min-height: 500px;
   overflow: hidden;
   position: relative;
+  cursor: zoom-in;
 }
 
 .contact-layout {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  gap: 52px;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: 64px;
   align-items: start;
 }
 
@@ -463,6 +556,15 @@ select {
   min-height: 44px;
   padding: 10px 12px;
   font: inherit;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(143, 113, 88, 0.13);
 }
 
 textarea {
@@ -491,9 +593,10 @@ textarea {
 .site-footer {
   border-top: 1px solid var(--line);
   text-align: center;
-  padding: 42px 24px 36px;
+  padding: 48px 24px 40px;
   color: var(--muted);
   font-size: 12px;
+  background: #fbfaf8;
 }
 
 .site-footer nav,
@@ -517,6 +620,38 @@ textarea {
   color: #fff;
   border-color: var(--ink);
   box-shadow: 0 16px 38px rgba(0, 0, 0, 0.2);
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 36px;
+  background: rgba(12, 11, 10, 0.92);
+}
+
+.lightbox img {
+  width: auto;
+  max-width: min(1200px, 92vw);
+  max-height: 88vh;
+  object-fit: contain;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+}
+
+.lightbox-close {
+  position: fixed;
+  right: 22px;
+  top: 18px;
+  z-index: 101;
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  font-size: 28px;
+  line-height: 1;
 }
 
 .editor-panel {
@@ -614,6 +749,10 @@ body.editing .editable-image {
   cursor: crosshair;
 }
 
+body.editing .image-view-label {
+  display: none;
+}
+
 body.editing .editable-image .image-edit-badge {
   display: block;
 }
@@ -637,6 +776,8 @@ body.editing .editable-image .image-edit-badge {
   .nav-shell {
     min-height: auto;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 20px;
+    padding: 16px 20px;
   }
 
   .brand-mark {
@@ -667,6 +808,14 @@ body.editing .editable-image .image-edit-badge {
     padding: 60px 20px;
   }
 
+  h1 {
+    font-size: clamp(34px, 13vw, 52px);
+  }
+
+  h2 {
+    font-size: clamp(28px, 10vw, 38px);
+  }
+
   .masonry,
   .gallery-grid,
   .gallery-grid.grid-mode {
@@ -690,7 +839,19 @@ body.editing .editable-image .image-edit-badge {
     min-height: 500px;
   }
 
+  .hero-copy {
+    padding: 34px 20px;
+  }
+
   .carousel-button {
     display: none;
+  }
+
+  .review {
+    padding: 28px 22px;
+  }
+
+  .lightbox {
+    padding: 18px;
   }
 }
