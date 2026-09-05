@@ -50,6 +50,7 @@ const defaultState = {
     portfolioLead: { ...assetAt("portfolio", 14), alt: "Newlyweds embracing by Sydney Harbour, the bride's dress caught in the breeze." },
     portfolioPortrait: { ...assetAt("portfolio", 1), alt: "Studio portrait of a woman in a red dress against a soft grey backdrop." },
     portfolioLive: { ...assetAt("portfolio", 42), alt: "A singer on stage beneath beams of blue light." },
+    homePerformance: { ...assetAt("events", 20), alt: "A DJ performing beneath blue and yellow stage lighting." },
     commercialLead: { ...assetAt("events", 39), alt: "A speaker preparing to address guests in an elegantly lit ballroom." },
     contactFeature: { ...assetAt("portfolio", 35), alt: "A couple sharing a quiet moment beneath flowering trees." },
     portfolio: portfolioImages.map((image) => ({ ...image, position: "center" })),
@@ -334,7 +335,7 @@ const templates = {
 function homeCarousel() {
   const slides = [
     ["homeWedding", "home.hero1.title", "Weddings & couples", "home.hero1.sub", "The big feelings. The little moments. All yours.", "/portfolio/", "Explore the portfolio"],
-    ["portfolioLive", "home.hero3.title", "Live performance", "home.hero3.sub", "The energy of the room, held in a photograph.", "/events/", "Explore events"],
+    ["homePerformance", "home.hero3.title", "Live performance", "home.hero3.sub", "The energy of the room, held in a photograph.", "/events/", "Explore events"],
     ["homeBrand", "home.hero4.title", "Brands & hospitality", "home.hero4.sub", "An eye for the details that make you different.", "/events/", "View commercial work"]
   ];
 
