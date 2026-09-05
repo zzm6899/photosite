@@ -18,6 +18,12 @@ const types = {
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
+  const legacyPage = url.pathname.match(/^\/(?:pages\/)?(portfolio|events|testimonials|contact)\.html$/);
+  if (legacyPage && (req.method === "GET" || req.method === "HEAD")) {
+    res.writeHead(301, { Location: `/${legacyPage[1]}/${url.search}` });
+    res.end();
+    return;
+  }
 
   if (req.method === "POST" && url.pathname === "/api/content") {
     let body = "";

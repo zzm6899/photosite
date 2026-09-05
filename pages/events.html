@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Branding & Events — Zac Morgan Photography</title>
+  <meta name="description" content="Corporate events, product launches, business branding and party photography by Zac Morgan Photography, Sydney." />
+  <!-- Social sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Branding & Events — Zac Morgan Photography" />
+  <meta property="og:description" content="Corporate events, product launches, business branding and party photography by Zac Morgan Photography, Sydney." />
+  <meta property="og:image" content="../images/CurzonHallSchneiderCorporate26-10-24-137-a73cd404-1500.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Branding & Events — Zac Morgan Photography" />
+  <meta name="twitter:description" content="Corporate events, product launches, and business branding photography in Sydney." />
+  <meta name="twitter:image" content="../images/CurzonHallSchneiderCorporate26-10-24-137-a73cd404-1500.jpg" />
+  <!-- Font preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--bg:#0d0d0d;--fg:#f5f5f5;--muted:#999;--accent:#b8956a;--border:#222;}
+    body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;line-height:1.6;}
+    a{color:inherit;text-decoration:none;}
+    img{max-width:100%;display:block;}
+
+    /* NAV */
+    .site-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);height:72px;display:flex;align-items:center;}
+    .nav-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem;width:100%;display:flex;align-items:center;justify-content:space-between;}
+    .nav-logo{font-family:'Lora',serif;font-size:1.1rem;color:var(--fg);}
+    .nav-links{list-style:none;display:flex;gap:2rem;align-items:center;}
+    .nav-links a{font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);transition:color 0.3s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--fg);}
+    .nav-cta{background:var(--fg)!important;color:var(--bg)!important;padding:0.5rem 1.2rem;border-radius:2px;}
+    .nav-toggle{display:none;}
+
+    /* HERO CARDS */
+    .events-hero-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;padding:0 1.5rem;max-width:1200px;margin:88px auto 0;}
+    .events-hero-card{position:relative;overflow:hidden;aspect-ratio:3/4;border-radius:2px;}
+    .events-hero-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.5s;}
+    .events-hero-card:hover img{transform:scale(1.05);}
+    .events-hero-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.15) 50%,transparent 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:2rem;}
+    .events-hero-card-overlay h3{font-family:'Lora',serif;font-size:1.5rem;margin-bottom:0.25rem;}
+    .events-hero-card-overlay p{font-size:0.8rem;color:var(--muted);margin-bottom:1rem;}
+
+    /* BUTTONS */
+    .btn{display:inline-block;padding:0.7rem 2rem;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;transition:all 0.3s;border-radius:2px;}
+    .btn--filled{background:var(--fg);color:var(--bg);}
+    .btn--filled:hover{opacity:0.85;}
+    .btn--outline,.btn--light{border:1px solid rgba(255,255,255,0.4);color:var(--fg);}
+    .btn--outline:hover,.btn--light:hover{border-color:var(--fg);}
+
+    /* ABOUT */
+    .events-about{max-width:700px;margin:0 auto;padding:5rem 1.5rem;text-align:center;}
+    .events-about .eyebrow{display:block;font-size:0.72rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;}
+    .events-about h2{font-family:'Lora',serif;font-size:1.8rem;margin-bottom:1.5rem;}
+    .events-about p{color:var(--muted);margin-bottom:1rem;}
+
+    /* GALLERY */
+    .events-gallery{max-width:1200px;margin:0 auto;padding:0 1rem 3rem;columns:3;column-gap:0.75rem;}
+    .events-gallery-item{break-inside:avoid;margin-bottom:0.75rem;overflow:hidden;border-radius:2px;}
+    .events-gallery-item img{width:100%;display:block;transition:transform 0.5s;}
+    .events-gallery-item:hover img{transform:scale(1.05);}
+
+    /* CTA */
+    .testimonial-strip{text-align:center;padding:4rem 1.5rem;border-top:1px solid var(--border);}
+    .testimonial-strip h2{font-family:'Lora',serif;font-size:1.6rem;font-style:italic;}
+
+    /* FOOTER */
+    .site-footer{text-align:center;padding:3rem 1.5rem;border-top:1px solid var(--border);}
+    .footer-logo{font-family:'Lora',serif;font-size:1rem;margin-bottom:1rem;}
+    .footer-nav{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+    .footer-nav a{font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+    .footer-nav a:hover{color:var(--fg);}
+    .footer-instagram{font-size:0.8rem;color:var(--accent);}
+    .footer-copy{font-size:0.7rem;color:var(--muted);}
+
+    @media(max-width:768px){
+      .nav-links{display:none;}
+      .nav-toggle{display:block;background:none;border:none;cursor:pointer;}
+      .nav-toggle span{display:block;width:22px;height:2px;background:var(--fg);margin:5px 0;}
+      .events-hero-cards{grid-template-columns:1fr;margin-top:80px;}
+      .events-gallery{columns:2;}
+    }
+    @media(max-width:480px){
+      .events-gallery{columns:1;}
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">Zac Morgan Photography</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="events.html" class="active">Branding / Events</a></li>
+        <li><a href="testimonials.html">Testimonials</a></li>
+        <li><a href="contact.html" class="nav-cta">Contact</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <!-- HERO CARDS -->
+  <div class="events-hero-cards">
+    <div class="events-hero-card">
+      <img src="../images/LeMontageGraduationSetup15-11-240008-Enhanced-NR-6dd7038d-1500.jpg" alt="Formals photography" loading="lazy" />
+      <div class="events-hero-card-overlay">
+        <h3>Formals</h3>
+        <p>Let's capture it together</p>
+        <a href="contact.html" class="btn btn--light" style="font-size:0.75rem;padding:0.5rem 1.2rem;">Connect</a>
+      </div>
+    </div>
+    <div class="events-hero-card">
+      <img src="../images/A60th-105-f4fc8564-1500.jpg" alt="Parties photography" loading="lazy" />
+      <div class="events-hero-card-overlay">
+        <h3>Parties</h3>
+        <p>Let's capture it together</p>
+        <a href="contact.html" class="btn btn--light" style="font-size:0.75rem;padding:0.5rem 1.2rem;">Connect</a>
+      </div>
+    </div>
+    <div class="events-hero-card">
+      <img src="../images/OatlandsEstateSmallBusinessEvent30-10-24137-941672ee-1500.jpg" alt="Business photography" loading="lazy" />
+      <div class="events-hero-card-overlay">
+        <h3>Business</h3>
+        <p>Let's capture it together</p>
+        <a href="contact.html" class="btn btn--light" style="font-size:0.75rem;padding:0.5rem 1.2rem;">Connect</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="events-about">
+    <span class="eyebrow">Branding &amp; Events</span>
+    <h2>Let's capture the essence of your brand together</h2>
+    <p>Moments that define your business, crafted into powerful visual stories.</p>
+    <p>When you're hosting an event, launching a product, or showcasing your business, every detail matters. These are not just ordinary moments — they are opportunities to leave a lasting impression.</p>
+    <p>I capture not just the people and places but the energy, atmosphere and essence of your brand. Whether it's a corporate gala, a product launch or a networking event, my goal is to deliver visuals that tell that unique story.</p>
+    <p>Interested in what I can do for you?</p>
+    <a href="contact.html" class="btn btn--filled" style="margin-top:1rem;">Let's Connect</a>
+  </div>
+
+  <!-- GALLERY — 44 images -->
+  <div class="events-gallery">
+    <div class="events-gallery-item"><img src="../images/GreenwoodHotel_Cruiser_31.10.240095-66aa8a97-1500.jpg" alt="Greenwood Hotel event" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/CurzonHallSchneiderCorporate26-10-24-137-a73cd404-1500.jpg" alt="Corporate event at Curzon Hall" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/CoogeBay_TheVanns_22.09.240010-55b7de43-1000.jpg" alt="Coogee Bay event" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/CoogeBay_TheVanns_22.09.240103-e2c64234-1000.jpg" alt="Live band on lit stage" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/TheWarwick-NRL-46-d81e67e2-1000.jpg" alt="NRL event at The Warwick" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/TheWarwick-NRL-115-fd62b041-1000.jpg" alt="Corporate event photography" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/GreenwoodHotel_Cruiser_31.10.240113-9d7ee37a-1000.jpg" alt="Party event photography" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/Stryd-140-23fcbd32-1500.jpg" alt="Business networking event" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatlandsEstateSmallBusinessEvent30-10-24137-941672ee-1500.jpg" alt="Small business event" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontage6-2-2025RoomShotsNESTLE25of71-9fbc4fa0-1000.jpg" alt="Catered sandwich platters" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/GreenwoodHotel_Cruiser_31.10.240046-1968f83b-1000.jpg" alt="Concert attendee celebrating" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontageGraduationSetup15-11-240014-c0143d8e-1000.jpg" alt="Ballroom with blue lighting" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontageGraduationSetup15-11-240020-7765a1f9-1000.jpg" alt="Wine bottle and glassware" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontage6-2-2025RoomShotsNESTLE28of71-ba6f12f1-1000.jpg" alt="Chafing dishes at buffet" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatlandsEstateSmallBusinessEvent30-10-24109-685ba8df-1000.jpg" alt="Guests taking selfies" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatlandsEstateGraduationSetup13-11-240053-a0a25912-1000.jpg" alt="Outdoor event service area" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatLandsEstate1-2-25ElizabethRoom41of66-c3e36801-1000.jpg" alt="Crystal glasses and gifts" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontage6-2-2025RoomShotsNESTLE42of71-48d89002-1000.jpg" alt="Event space with blue lighting" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatlandsEstateSmallBusinessEvent30-10-24137-bf3f777d-1000.jpg" alt="Professionals networking" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/CurzonHallSchneiderCorporate26-10-24-150-bbd578c1-1000.jpg" alt="Group at stone venue" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatlandsEstateGraduationSetup13-11-240101-109e56c1-1000.jpg" alt="Gnocchi dish on blue plate" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontageGraduationSetup15-11-240083-d6a0e7e9-1000.jpg" alt="Elegant plated appetizer" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/GreenwoodHotel_Cruiser_31.10.240095-6fc96189-1000.jpg" alt="DJs performing outdoors" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/CurzonHallSchneiderCorporate26-10-24-123-1a103ed1-1000.jpg" alt="Chef preparing ingredients" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatlandsEstateSmallBusinessEvent30-10-2440-8b1563ef-1000.jpg" alt="Business event" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatlandsEstateGraduationSetup13-11-240005-5215dbe1-1000.jpg" alt="Graduation setup" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatlandsEstateSmallBusinessEvent30-10-2492-c99eeecf-1000.jpg" alt="Small business event" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/CPNSWWillsandEstatesPracticeGroupLaunch19.9.24-71-eb1b0c15-1000.jpg" alt="Practice group launch" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontageGraduationSetup15-11-240063-85d2230a-1000.jpg" alt="Graduation venue setup" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatLandsEstate1-2-25ElizabethRoom40of66-3154eaf2-1000.jpg" alt="Elizabeth Room setting" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatLandsEstate1-2-25ElizabethRoom53of66-7492f476-1000.jpg" alt="Elizabeth Room detail" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontage6-2-2025RoomShotsNESTLE21of71-6d0bcd53-1000.jpg" alt="Nestlé event room" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/GreenwoodHotel_Cruiser_31.10.240043-ebdf7ac8-1000.jpg" alt="Greenwood Hotel event" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/GreenwoodHotel_Cruiser_31.10.240089-4a1a3cd8-1000.jpg" alt="Greenwood Hotel party" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontageFIATLunch24-11-20240041-23fc97b5-1000.jpg" alt="FIAT lunch event" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatlandsEstateSmallBusinessEvent30-10-24131-9aec2a2c-1000.jpg" alt="Business networking" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/GreenwoodHotel_Cruiser_31.10.240067-b8adbe2b-1000.jpg" alt="Cruiser event" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/OatlandsEstateSmallBusinessEvent30-10-2452-3b296c3c-1000.jpg" alt="Small business networking" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/CPNSWWillsandEstatesPracticeGroupLaunch19.9.24-17-5c6a9062-1000.jpg" alt="CPNSW launch" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontageFIATLunch24-11-20240100-d14b1546-1000.jpg" alt="FIAT lunch" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontageGraduationSetup15-11-240075-2417651a-1000.jpg" alt="Graduation setup" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/SuttonSaleGuildAwardsNightJanuary2025-42-fd07c92d-1000.jpg" alt="Guild Awards Night" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/GreenwoodHotel_Cruiser_31.10.24FullCatelog0042-cafbd718-1000.jpg" alt="Greenwood Hotel catalog" loading="lazy" /></div>
+    <div class="events-gallery-item"><img src="../images/LeMontageGraduationSetup15-11-240008-Enhanced-NR-32a3bf7d-1000.jpg" alt="Enhanced graduation shot" loading="lazy" /></div>
+  </div>
+
+  <!-- CTA -->
+  <div class="testimonial-strip">
+    <h2 style="margin-bottom:1.5rem;">Ready to make your event unforgettable?</h2>
+    <a href="contact.html" class="btn btn--light">Get In Touch</a>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-logo">Zac Morgan Photography</div>
+    <nav class="footer-nav">
+      <a href="index.html">Home</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="events.html">Branding / Events</a>
+      <a href="testimonials.html">Testimonials</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <a href="https://www.instagram.com/zacmphotos" target="_blank" rel="noopener" class="footer-instagram">@zacmphotos on Instagram</a>
+    <p class="footer-copy" style="margin-top:1.5rem;">&copy; 2026 Zac Morgan Photography. All rights reserved.</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
