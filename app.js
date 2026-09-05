@@ -51,6 +51,8 @@ let editing = false;
 let selectedImage = null;
 let serverSaveTimer = 0;
 let carouselTimer = 0;
+let disposeMotion = () => {};
+let disposeCarousel = () => {};
 
 document.querySelector("[data-logo]").src = state.images.logo.src;
 document.querySelector("[data-logo]").alt = state.images.logo.alt;
@@ -121,11 +123,14 @@ function handleGlobalClick(event) {
   if (url.origin !== location.origin) return;
   event.preventDefault();
   history.pushState({}, "", url.pathname);
+  window.scrollTo({ top: 0, behavior: "instant" });
   render(routeToPage(url.pathname));
 }
 
 function render(page) {
   currentPage = page;
+  disposeMotion();
+  disposeCarousel();
   clearInterval(carouselTimer);
   applyPageSettings();
   document.title = page === "home" ? "Zac Morgan Photography" : `${title(page)} - Zac Morgan Photography`;
@@ -145,6 +150,7 @@ function render(page) {
   hydrateCarousel();
   hydrateLightbox();
   syncEditor();
+  disposeMotion = window.SiteMotion?.mount(app) || (() => {});
 }
 
 function title(page) {
@@ -337,6 +343,8 @@ function homeCarousel() {
       <div class="carousel-dots" aria-label="Choose slide">
         ${slides.map((_, index) => `<button type="button" data-carousel-dot="${index}" class="${index === 0 ? "is-active" : ""}" aria-label="Show slide ${index + 1}"></button>`).join("")}
       </div>
+      <button class="carousel-pause" type="button" data-carousel-pause aria-label="Pause slideshow" title="Pause slideshow"><span aria-hidden="true">&#10074;&#10074;</span></button>
+      <span class="carousel-count" data-carousel-count aria-hidden="true">01 / 06</span>
     </section>
   `;
 }
@@ -459,6 +467,13 @@ function hydrateCarousel() {
   if (!carousel) return;
 
   let active = 0;
+  const controller = new AbortController();
+  const options = { signal: controller.signal };
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  let paused = reducedMotion.matches;
+  let hovered = false;
+  let focused = false;
+  const pauseButton = carousel.querySelector("[data-carousel-pause]");
   const slides = [...carousel.querySelectorAll("[data-slide]")];
   const dots = [...carousel.querySelectorAll("[data-carousel-dot]")];
   const show = (index) => {
@@ -467,17 +482,40 @@ function hydrateCarousel() {
       const isActive = slideIndex === active;
       slide.classList.toggle("is-active", isActive);
       slide.setAttribute("aria-hidden", isActive ? "false" : "true");
+      slide.inert = !isActive;
     });
-    dots.forEach((dot, dotIndex) => dot.classList.toggle("is-active", dotIndex === active));
+    dots.forEach((dot, dotIndex) => {
+      dot.classList.toggle("is-active", dotIndex === active);
+      dot.setAttribute("aria-pressed", String(dotIndex === active));
+    });
+    carousel.querySelector("[data-carousel-count]").textContent = `${String(active + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`;
+    carousel.dispatchEvent(new CustomEvent("slidechange"));
   };
 
   carousel.querySelector("[data-carousel-prev]").addEventListener("click", () => show(active - 1));
   carousel.querySelector("[data-carousel-next]").addEventListener("click", () => show(active + 1));
   dots.forEach((dot, index) => dot.addEventListener("click", () => show(index)));
 
-  carouselTimer = setInterval(() => {
-    if (!editing) show(active + 1);
-  }, 5200);
+  const syncPlayback = () => {
+    clearInterval(carouselTimer);
+    pauseButton.setAttribute("aria-label", paused ? "Play slideshow" : "Pause slideshow");
+    pauseButton.title = paused ? "Play slideshow" : "Pause slideshow";
+    pauseButton.firstElementChild.textContent = paused ? "\u25b6" : "\u275a\u275a";
+    if (!paused && !hovered && !focused && !document.hidden && !editing) {
+      carouselTimer = setInterval(() => show(active + 1), 6200);
+    }
+  };
+  pauseButton.addEventListener("click", () => { paused = !paused; syncPlayback(); }, options);
+  carousel.addEventListener("pointerenter", (event) => { hovered = event.pointerType === "mouse"; syncPlayback(); }, options);
+  carousel.addEventListener("pointerleave", () => { hovered = false; syncPlayback(); }, options);
+  carousel.addEventListener("focusin", () => { focused = true; syncPlayback(); }, options);
+  carousel.addEventListener("focusout", (event) => { focused = carousel.contains(event.relatedTarget); syncPlayback(); }, options);
+  document.addEventListener("visibilitychange", syncPlayback, options);
+  document.addEventListener("editingchange", syncPlayback, options);
+  reducedMotion.addEventListener("change", () => { paused = reducedMotion.matches; syncPlayback(); }, options);
+  show(0);
+  syncPlayback();
+  disposeCarousel = () => { controller.abort(); clearInterval(carouselTimer); };
 }
 
 function bindEditor() {
@@ -546,6 +584,7 @@ function bindEditor() {
 function setEditing(value) {
   editing = value;
   document.body.classList.toggle("editing", editing);
+  document.dispatchEvent(new Event("editingchange"));
   hydrateEditableText();
   if (!editing) {
     selectedImage = null;
