@@ -1,8 +1,19 @@
 const siteAssets = Array.isArray(window.SITE_ASSETS) ? window.SITE_ASSETS : [];
+const imageDescriptions = {
+  "011-portfolio.jpg": "Guests celebrating on a dance floor, photographed with colourful motion blur.",
+  "019-portfolio.jpg": "Hands holding a skincare bottle in direct sunlight.",
+  "025-portfolio.jpg": "A groom lifts his bride beside Sydney Harbour.",
+  "027-portfolio.jpg": "Wedding rings and a bouquet of red roses.",
+  "031-portfolio.jpg": "A bartender garnishes a red cocktail with a slice of orange.",
+  "038-portfolio.jpg": "A portrait of a woman in sunglasses seated on a garden bench.",
+  "043-portfolio.jpg": "Guests enjoying lunch outside the Beach Hut restaurant.",
+  "044-portfolio.jpg": "Balter Cerveza bottles displayed on a sunlit bar.",
+  "096-events.jpg": "A speaker facing a ballroom filled with seated guests."
+};
 const assetsByPage = siteAssets.reduce((groups, item) => {
   const key = item.page === "www.zacmorganphotography.com" ? "home" : item.page;
   groups[key] ||= [];
-  groups[key].push({ src: item.src, alt: item.alt || "", position: "center" });
+  groups[key].push({ src: item.src, alt: imageDescriptions[item.src.split("/").pop()] || item.alt || "", position: "center" });
   return groups;
 }, {});
 
@@ -36,6 +47,11 @@ const defaultState = {
     homeCorporate: { ...assetAt("home", 5) },
     testimonialsCta: { ...assetAt("testimonials", 0) },
     contactHero: { ...assetAt("contact", 0) },
+    portfolioLead: { ...assetAt("portfolio", 14), alt: "Newlyweds embracing by Sydney Harbour, the bride's dress caught in the breeze." },
+    portfolioPortrait: { ...assetAt("portfolio", 1), alt: "Studio portrait of a woman in a red dress against a soft grey backdrop." },
+    portfolioLive: { ...assetAt("portfolio", 42), alt: "A singer on stage beneath beams of blue light." },
+    commercialLead: { ...assetAt("events", 39), alt: "A speaker preparing to address guests in an elegantly lit ballroom." },
+    contactFeature: { ...assetAt("portfolio", 35), alt: "A couple sharing a quiet moment beneath flowering trees." },
     portfolio: portfolioImages.map((image) => ({ ...image, position: "center" })),
     events: eventImages.map((image) => ({ ...image, position: "center" }))
   }
@@ -53,6 +69,18 @@ let serverSaveTimer = 0;
 let carouselTimer = 0;
 let disposeMotion = () => {};
 let disposeCarousel = () => {};
+const galleryFilters = { portfolio: "selected", events: "selected" };
+const collectionLabels = { selected: "Selected", weddings: "Weddings", events: "Events & live", commercial: "Brands & hospitality", portraits: "Portraits", all: "All work" };
+const collections = {
+  portfolio: {
+    selected: [14, 1, 42, 20, 29, 8, 25, 33, 3, 15, 9, 43, 30, 36, 27, 35, 18, 45],
+    weddings: [14, 35, 29, 30, 23, 15, 2, 16, 19, 25, 31],
+    events: [42, 43, 44, 45, 38, 3, 13, 12, 17, 18, 0, 5, 6, 7, 39, 40, 41],
+    commercial: [20, 36, 33, 4, 8, 9, 10, 11, 21, 22, 24, 32, 34, 37],
+    portraits: [1, 27, 28, 26]
+  },
+  events: { selected: [39, 25, 40, 29, 5, 36, 19, 35, 4, 13, 30, 37, 20, 21, 32, 41, 7, 22] }
+};
 
 document.querySelector("[data-logo]").src = state.images.logo.src;
 document.querySelector("[data-logo]").alt = state.images.logo.alt;
@@ -128,6 +156,7 @@ function handleGlobalClick(event) {
 }
 
 function render(page) {
+  setMenuOpen(false);
   currentPage = page;
   disposeMotion();
   disposeCarousel();
@@ -149,6 +178,8 @@ function render(page) {
   hydrateEditableImages();
   hydrateCarousel();
   hydrateLightbox();
+  hydrateGalleryFilters();
+  hydrateContactForm();
   syncEditor();
   disposeMotion = window.SiteMotion?.mount(app) || (() => {});
 }
@@ -182,11 +213,13 @@ function escapeHtml(value) {
 
 function imageHtml(ref, className = "image-tile", extra = "") {
   const data = resolveImage(ref);
-  const priority = className.includes("portfolio-cover") || className.includes("wide-image");
+  const dimensions = window.SITE_IMAGE_DIMENSIONS?.[data.src];
+  const size = dimensions ? `width="${dimensions[0]}" height="${dimensions[1]}"` : "";
+  const priority = className.includes("cover") || className.includes("wide-image");
   return `
-    <div class="${className} editable-image" data-image-ref="${ref}" data-lightbox-image="${data.src}" data-lightbox-alt="${escapeHtml(data.alt)}" ${extra}>
+    <div class="${className} editable-image" role="button" tabindex="0" aria-label="View photograph: ${escapeHtml(data.alt)}" data-image-ref="${ref}" data-lightbox-image="${escapeHtml(data.src)}" data-lightbox-alt="${escapeHtml(data.alt)}" ${extra}>
       <span class="image-edit-badge">Edit image</span>
-      <img src="${data.src}" alt="${escapeHtml(data.alt)}" style="--pos: ${data.position || "center"}" loading="${priority ? "eager" : "lazy"}" decoding="async">
+      <img src="${escapeHtml(data.src)}" ${size} alt="${escapeHtml(data.alt)}" style="--pos: ${escapeHtml(data.position || "center")}" loading="${priority ? "eager" : "lazy"}" decoding="async">
       <span class="image-view-label">View</span>
     </div>
   `;
@@ -205,20 +238,25 @@ const templates = {
     <article class="page">
       ${homeCarousel()}
       <section class="section narrow">
-        ${editable("home.about.title", "Hey, I'm zac an event / wedding photographer", "h2")}
-        ${editable("home.about.sub", "Let’s get to know each other", "p")}
-        ${editable("home.about.body", "Photography has been my hobby since I was a child. Capturing the moment and sharing those memories is what makes me happy .", "p")}
-        <a class="button-link" href="/portfolio/" data-link>Check out my work</a>
+        <p class="eyebrow">Behind the camera</p>
+        ${editable("home.about.title", "Hi, I'm Zac.", "h2")}
+        ${editable("home.about.sub", "Photographs with feeling. An eye for the details.", "h3")}
+        ${editable("home.about.body", "From a wedding's quiet moments to the energy of a live show, I photograph people at their most natural. My work brings together honest connection, considered composition, and the atmosphere that makes each occasion its own.", "p")}
+        <a class="button-link" href="/portfolio/" data-link>Explore my work</a>
+      </section>
+      <section class="home-selections" aria-label="Explore the collections">
+        ${collectionCard("portfolioLead", "Weddings & couples", "/portfolio/", "01")}
+        ${collectionCard("portfolioLive", "Events & live music", "/events/", "02")}
+        ${collectionCard("commercialLead", "Brands & hospitality", "/events/", "03")}
       </section>
       <section class="text-band">
         <div class="quote-shell">
-          <p class="quote">${escapeHtml(text("home.quote", "\"Zac Morgan really was the ultimate professional, capturing only the best of photos for my son’s 21st. Would definitely recommend him to anyone who is looking for the ultimate professional. Thank you Zac for creating a lifetime of memories.\""))}</p>
-          <p class="quote-author">— Henry M</p>
+          <p class="eyebrow">Kind words</p>
+          <p class="quote">${escapeHtml(text("home.quote.v2", "\"He was able to capture great photos of us, our families and candid photos from the day. Highly recommend his services.\""))}</p>
+          <p class="quote-author">Alexander · Wedding photography</p>
           <div class="feature-links">
-            <a href="/portfolio/" data-link>Engagements / Weddings</a>
-            <a href="/portfolio/" data-link>Band Photos</a>
-            <a href="/events/" data-link>Corporate Events</a>
-            <a href="/portfolio/" data-link>Parties</a>
+            <a href="/testimonials/" data-link>More client stories</a>
+            <a href="/contact/" data-link>Enquire about a shoot</a>
           </div>
         </div>
       </section>
@@ -227,82 +265,65 @@ const templates = {
   portfolio: () => `
     <article class="page">
       <section class="portfolio-showcase">
-        <div class="portfolio-copy">
-          <p class="eyebrow">Zac Morgan Photography</p>
-          ${editable("portfolio.title", "Portfolio", "h1")}
-          ${editable("portfolio.sub", "Editorial event, wedding, hospitality, and portrait photography with a natural finish and a polished commercial eye.", "h3")}
-          ${editable("portfolio.body1", "A curated selection of commissioned work, built around atmosphere, detail, movement, and honest colour.", "p")}
-          <div class="button-row">
-            <a class="button-link" href="/contact/" data-link>Book a shoot</a>
-            <a class="button-link secondary" href="/events/" data-link>Business portfolio</a>
-          </div>
+        <div class="portfolio-intro">
+          <div><p class="eyebrow">Zac Morgan Photography / Portfolio</p>
+          ${editable("portfolio.title", "Selected work", "h1")}</div>
+          ${editable("portfolio.sub", "A quiet glance. A room full of energy. The details that bring a story to life.", "p")}
         </div>
         <div class="portfolio-cover" aria-label="Featured portfolio images">
-          ${imageHtml("portfolio.0", "portfolio-cover-main")}
-          ${imageHtml("portfolio.1", "portfolio-cover-side top")}
-          ${imageHtml("portfolio.2", "portfolio-cover-side bottom")}
+          <figure>${imageHtml("portfolioLead", "cover-image")}<figcaption><span>Weddings & couples</span><span>01</span></figcaption></figure>
+          <figure>${imageHtml("portfolioPortrait", "cover-image")}<figcaption><span>Portraits</span><span>02</span></figcaption></figure>
+          <figure>${imageHtml("portfolioLive", "cover-image")}<figcaption><span>Live performance</span><span>03</span></figcaption></figure>
         </div>
       </section>
-      <section class="gallery-heading">
-        <p class="eyebrow">Selected Work</p>
-        ${editable("portfolio.galleryHeading", "Clean, vivid coverage across real moments and produced spaces.", "h2")}
-      </section>
-      ${gallery("portfolio")}
-      <section class="section narrow dark-band">
-        ${editable("portfolio.cta", "Like What you see?", "h2")}
-        <a class="button-link" href="/contact/" data-link>Contact Now</a>
-      </section>
+      ${galleryBrowser("portfolio")}
+      ${enquiryBand("portfolio.cta", "Your story, thoughtfully captured.")}
     </article>
   `,
   events: () => `
     <article class="page">
-      <section class="events-top">
-        ${hero("events.0", "events.formals.title", "Formals", "events.formals.sub", "Let’s capture it together", "/contact/", "Connect", "small")}
-        ${hero("events.1", "events.parties.title", "Parties", "events.parties.sub", "Let’s capture it together", "/contact/", "Connect", "small")}
-        ${hero("events.2", "events.business.title", "Business", "events.business.sub", "Let’s capture it together", "/contact/", "Connect", "small")}
+      <section class="commercial-hero">
+        ${hero("commercialLead", "events.title", "Brands & events", "events.sub", "The people, places, and details behind your business.", "/contact/", "Discuss your brief")}
       </section>
-      <section class="section narrow page-intro">
-        <p class="eyebrow">Branding / Events</p>
-        ${editable("events.intro2", "Brand moments with atmosphere, detail, and intent.", "h2")}
-        ${editable("events.body1", "Corporate events, launches, hospitality activations, and formal celebrations photographed with a clean editorial eye.", "p")}
+      <section class="section service-intro">
+        <div><p class="eyebrow">Commercial photography</p>${editable("events.intro2", "Make the right impression.", "h2")}</div>
+        <div>${editable("events.body1", "From conferences and product launches to restaurant menus and live performances, I create photographs that capture the character of your business and the energy of your event.", "p")}
+        <p class="service-list">Corporate events · Hospitality · Products · Live music</p></div>
       </section>
-      ${gallery("events")}
-      <section class="section narrow">
-        ${editable("events.cta", "interested in what i can do for you?", "h2")}
-        <a class="button-link" href="/contact/" data-link>Let's Connect</a>
-      </section>
+      ${galleryBrowser("events")}
+      ${enquiryBand("events.cta", "Let's bring your next brief to life.")}
     </article>
   `,
   testimonials: () => `
     <article class="page">
       <section class="reviews page-intro">
         <p class="eyebrow">Testimonials</p>
-        ${editable("testimonials.title", "Reviews from my Clients", "h1")}
+        ${editable("testimonials.title", "Kind words", "h1")}
+        <p class="reviews-intro">A few words from the people I've had the pleasure of photographing.</p>
+        <div class="reviews-grid">
         ${reviews.map((review, index) => `
           <div class="review">
             <blockquote data-editable data-key="review.${index}.quote">${escapeHtml(text(`review.${index}.quote`, `"${review.quote}"`))}</blockquote>
             <cite data-editable data-key="review.${index}.author">- ${escapeHtml(text(`review.${index}.author`, review.author))}</cite>
           </div>
         `).join("")}
+        </div>
       </section>
       <section class="cta-image">
         ${imageHtml("testimonialsCta", "wide-image")}
       </section>
-      <section class="section narrow">
-        ${editable("testimonials.cta", "Ready to enquire?", "h2")}
-        <a class="button-link" href="/contact/" data-link>Let's Connect</a>
-      </section>
+      ${enquiryBand("testimonials.cta", "Let's make something worth remembering.")}
     </article>
   `,
   contact: () => `
     <article class="page">
       <section class="section contact-layout">
-        ${imageHtml("contactHero", "wide-image")}
+        ${imageHtml("contactFeature", "contact-image wide-image")}
         <div>
-          ${editable("contact.title", "Let's start your Journey", "h2")}
-          ${editable("contact.body1", "Are you ready to showcase your brand, capture impactful moments, and elevate your business presence through powerful imagery? As a professional event and branding photographer, I’m here to help you create visuals that leave a lasting impression.", "p")}
-          ${editable("contact.body2", "Whether it’s a corporate event, product launch, conference, gala, or commercial shoot, I’m dedicated to documenting the essence of your brand with precision and creativity. Every shot is crafted to highlight the energy, professionalism, and unique story behind your business.", "p")}
-          ${editable("contact.body3", "Let’s collaborate to ensure every detail, every connection, and every meaningful moment is beautifully captured—providing you with high-quality visuals that resonate with your audience and stand the test of time.", "p")}
+          <p class="eyebrow">Enquiries</p>
+          ${editable("contact.title", "Let's work together.", "h1")}
+          ${editable("contact.body1", "Planning a wedding, hosting an event, or creating something for your brand? Tell me a little about it. I'd love to hear what you have in mind.", "p")}
+          <a class="contact-email" href="mailto:zacmorganphotography@gmail.com">zacmorganphotography@gmail.com</a>
           ${contactForm()}
         </div>
       </section>
@@ -312,12 +333,9 @@ const templates = {
 
 function homeCarousel() {
   const slides = [
-    ["homeWedding", "home.hero1.title", "Wedding / Engagement Shoots", "home.hero1.sub", "For your personal records", "/portfolio/", "View Portfolio"],
-    ["homeEvent", "home.hero2.title", "Event Photography", "home.hero2.sub", "Time to create memories", "/events/", "View Portfolio"],
-    ["homeAction", "home.hero3.title", "Live in action", "home.hero3.sub", "Time to immerse yourself", "/events/", "View Portfolio"],
-    ["homeBrand", "home.hero4.title", "Brand/ Business Shoots", "home.hero4.sub", "Images for your business / Social Media", "/events/", "Learn more"],
-    ["homeParty", "home.hero5.title", "Parties", "home.hero5.sub", "Let’s capture it together", "/portfolio/", "Learn more"],
-    ["homeCorporate", "home.hero6.title", "Corporate Events", "home.hero6.sub", "Let’s capture it together", "/events/", "Learn more"]
+    ["homeWedding", "home.hero1.title", "Weddings & couples", "home.hero1.sub", "The big feelings. The little moments. All yours.", "/portfolio/", "Explore the portfolio"],
+    ["portfolioLive", "home.hero3.title", "Live performance", "home.hero3.sub", "The energy of the room, held in a photograph.", "/events/", "Explore events"],
+    ["homeBrand", "home.hero4.title", "Brands & hospitality", "home.hero4.sub", "An eye for the details that make you different.", "/events/", "View commercial work"]
   ];
 
   return `
@@ -330,6 +348,7 @@ function homeCarousel() {
               <span class="image-edit-badge">Edit image</span>
               <img src="${data.src}" alt="${escapeHtml(data.alt)}" style="--pos: ${data.position || "center"}">
               <div class="hero-copy">
+                <p class="eyebrow">Zac Morgan Photography</p>
                 ${editable(titleKey, titleText, "h1")}
                 ${editable(subKey, subText, "p")}
                 <a class="button-link" href="${href}" data-link>${cta}</a>
@@ -344,7 +363,7 @@ function homeCarousel() {
         ${slides.map((_, index) => `<button type="button" data-carousel-dot="${index}" class="${index === 0 ? "is-active" : ""}" aria-label="Show slide ${index + 1}"></button>`).join("")}
       </div>
       <button class="carousel-pause" type="button" data-carousel-pause aria-label="Pause slideshow" title="Pause slideshow"><span aria-hidden="true">&#10074;&#10074;</span></button>
-      <span class="carousel-count" data-carousel-count aria-hidden="true">01 / 06</span>
+      <span class="carousel-count" data-carousel-count aria-hidden="true">01 / 03</span>
     </section>
   `;
 }
@@ -364,13 +383,48 @@ function hero(imageRef, titleKey, titleText, subKey, subText, href, cta, size = 
   `;
 }
 
+function collectionCard(ref, label, href, number) {
+  return `<figure>${imageHtml(ref, "collection-image")}<figcaption><a href="${href}" data-link>${label}</a><span>${number}</span></figcaption></figure>`;
+}
+
+function enquiryBand(key, heading) {
+  return `<section class="enquiry-band"><div><p class="eyebrow">Create something personal</p>${editable(key, heading, "h2")}</div><a class="button-link" href="/contact/" data-link>Enquire about a shoot <span aria-hidden="true">&#8599;</span></a></section>`;
+}
+
+function galleryBrowser(group) {
+  const filters = group === "portfolio" ? Object.keys(collectionLabels) : ["selected", "all"];
+  return `<section class="gallery-browser" data-gallery-browser="${group}">
+    <div class="gallery-toolbar"><div class="collection-filters" aria-label="Photography collections">${filters.map(filter => `<button type="button" data-filter="${filter}" aria-pressed="${galleryFilters[group] === filter}">${collectionLabels[filter]}</button>`).join("")}</div><span class="gallery-count" aria-live="polite"></span></div>
+    <div data-gallery-results>${gallery(group)}</div>
+  </section>`;
+}
+
 function gallery(group) {
   const modeClass = `${state.settings[currentPage].mode}-mode`;
+  const indices = galleryFilters[group] === "all" ? state.images[group].map((_, index) => index) : collections[group][galleryFilters[group]];
   return `
     <section class="gallery-grid ${modeClass}" aria-label="${group} gallery">
-      ${state.images[group].map((_, index) => imageHtml(`${group}.${index}`, `image-tile ${index % 5 === 1 ? "tall" : ""} ${index % 6 === 2 ? "wide" : ""}`)).join("")}
+      ${indices.filter(index => state.images[group][index]).map(index => imageHtml(`${group}.${index}`)).join("")}
     </section>
   `;
+}
+
+function hydrateGalleryFilters() {
+  const browser = app.querySelector("[data-gallery-browser]");
+  if (!browser) return;
+  const group = browser.dataset.galleryBrowser;
+  const updateCount = () => { browser.querySelector(".gallery-count").textContent = `${browser.querySelectorAll(".image-tile").length} photographs`; };
+  updateCount();
+  browser.querySelectorAll("[data-filter]").forEach(button => button.addEventListener("click", () => {
+    galleryFilters[group] = button.dataset.filter;
+    browser.querySelectorAll("[data-filter]").forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+    browser.querySelector("[data-gallery-results]").innerHTML = gallery(group);
+    hydrateEditableImages();
+    hydrateLightbox();
+    disposeMotion();
+    disposeMotion = window.SiteMotion?.mount(app) || (() => {});
+    updateCount();
+  }));
 }
 
 const reviews = [
@@ -385,33 +439,44 @@ const reviews = [
 ];
 
 function contactForm() {
-  const sessionTypes = ["Event Shoot", "Corporate Event", "Wedding", "Business Shoot", "Casual", "Other"];
+  const sessionTypes = ["Wedding or engagement", "Event or live music", "Brand or hospitality", "Portrait", "Other"];
   return `
-    <form class="contact-form" action="mailto:hello@example.com" method="post" enctype="text/plain">
-      <label>Your name *<input name="name" required></label>
-      <label>Email address *<input type="email" name="email" required></label>
-      <label class="full">Phone Number *<input type="tel" name="phone" required></label>
-      <div class="radio-grid">
+    <form class="contact-form" action="mailto:zacmorganphotography@gmail.com" method="post" enctype="text/plain">
+      <label>Your name *<input name="name" autocomplete="name" required></label>
+      <label>Email address *<input type="email" name="email" autocomplete="email" required></label>
+      <label class="full">Phone number<input type="tel" name="phone" autocomplete="tel"></label>
+      <fieldset class="radio-grid"><legend>What are you planning?</legend>
         ${sessionTypes.map((type) => `<label><input type="radio" name="session" value="${type}">${type}</label>`).join("")}
-      </div>
-      <label>Event Date *<input type="date" name="date" required></label>
-      <label>Event Location *<input name="location" required></label>
-      <label class="full">Details / message *<textarea name="message" rows="6" required></textarea></label>
+      </fieldset>
+      <label>Date, if known<input type="date" name="date"></label>
+      <label>Location<input name="location"></label>
+      <label class="full">Tell me about your plans *<textarea name="message" rows="4" required></textarea></label>
       <label class="full">How did you hear about me?
         <select name="source">
-          <option>Select option</option>
+          <option value="">Please select</option>
           <option>From a recent shoot</option>
-          <option>Ad</option>
+          <option>Advertisement</option>
           <option>Instagram</option>
           <option>Google</option>
           <option>From a friend</option>
-          <option>Bark / Oneflare / AirTasker</option>
+          <option>Bark / Oneflare / Airtasker</option>
           <option>Other</option>
         </select>
       </label>
-      <button type="submit">Send Message</button>
+      <button type="submit">Continue to email <span aria-hidden="true">&#8599;</span></button>
+      <p class="form-note full">Your email app will open with your enquiry ready to send.</p>
     </form>
   `;
+}
+
+function hydrateContactForm() {
+  app.querySelector(".contact-form")?.addEventListener("submit", event => {
+    event.preventDefault();
+    const values = new FormData(event.currentTarget);
+    const labels = { name: "Name", email: "Email", phone: "Phone", session: "Photography", date: "Date", location: "Location", message: "Plans", source: "Referral" };
+    const body = [...values.entries()].filter(([, value]) => value).map(([key, value]) => `${labels[key]}: ${value}`).join("\n\n");
+    location.href = `mailto:zacmorganphotography@gmail.com?subject=${encodeURIComponent(`Photography enquiry from ${values.get("name")}`)}&body=${encodeURIComponent(body)}`;
+  });
 }
 
 function hydrateEditableText() {
@@ -426,6 +491,8 @@ function hydrateEditableText() {
 
 function hydrateEditableImages() {
   document.querySelectorAll(".editable-image").forEach((node) => {
+    if (node.dataset.editBound) return;
+    node.dataset.editBound = "true";
     node.addEventListener("click", (event) => {
       if (!editing) return;
       event.preventDefault();
@@ -437,27 +504,30 @@ function hydrateEditableImages() {
 
 function hydrateLightbox() {
   document.querySelectorAll("[data-lightbox-image]").forEach((node) => {
+    if (node.dataset.lightboxBound) return;
+    node.dataset.lightboxBound = "true";
+    node.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); node.click(); }
+    });
     node.addEventListener("click", (event) => {
       if (editing) return;
       event.preventDefault();
       const src = node.dataset.lightboxImage;
       const alt = node.dataset.lightboxAlt || "";
-      const lightbox = document.createElement("div");
+      const lightbox = document.createElement("dialog");
       lightbox.className = "lightbox";
+      lightbox.setAttribute("aria-label", "Photograph viewer");
       lightbox.innerHTML = `
         <button type="button" class="lightbox-close" aria-label="Close image">×</button>
-        <img src="${src}" alt="${escapeHtml(alt)}">
+        <img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}">
       `;
-      const close = () => lightbox.remove();
+      const close = () => { lightbox.close(); lightbox.remove(); node.focus({ preventScroll: true }); };
       lightbox.addEventListener("click", (clickEvent) => {
         if (clickEvent.target === lightbox || clickEvent.target.closest(".lightbox-close")) close();
       });
-      document.addEventListener("keydown", function onKeydown(keyEvent) {
-        if (keyEvent.key !== "Escape") return;
-        close();
-        document.removeEventListener("keydown", onKeydown);
-      });
+      lightbox.addEventListener("cancel", event => { event.preventDefault(); close(); });
       document.body.appendChild(lightbox);
+      lightbox.showModal();
     });
   });
 }
@@ -583,6 +653,7 @@ function bindEditor() {
 
 function setEditing(value) {
   editing = value;
+  document.querySelector("[data-editor]").inert = !value;
   document.body.classList.toggle("editing", editing);
   document.dispatchEvent(new Event("editingchange"));
   hydrateEditableText();
@@ -622,6 +693,16 @@ function updateSelectedImage(patch, rerender = true) {
   if (rerender) render(currentPage);
 }
 
+function setMenuOpen(open) {
+  const toggle = document.querySelector(".menu-toggle");
+  toggle.setAttribute("aria-expanded", String(open));
+  toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+  toggle.title = open ? "Close navigation" : "Open navigation";
+  document.querySelector(".nav-links").classList.toggle("is-open", open);
+}
+
+document.querySelector(".menu-toggle").addEventListener("click", event => setMenuOpen(event.currentTarget.getAttribute("aria-expanded") !== "true"));
+document.addEventListener("keydown", event => { if (event.key === "Escape") setMenuOpen(false); });
 bindEditor();
 render(currentPage);
 hydrateFromServer();

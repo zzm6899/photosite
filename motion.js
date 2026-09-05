@@ -10,8 +10,8 @@ window.SiteMotion = {
     let disposeScene = () => {};
     let sceneGeneration = 0;
     const header = document.querySelector("[data-header]");
-    const targets = [...root.querySelectorAll(".section.narrow, .gallery-heading, .review, .quote-shell, .contact-layout > *, .portfolio-copy > *, .portfolio-cover, .image-tile")];
-    const covers = [...root.querySelectorAll(".portfolio-cover-side")];
+    const targets = [...root.querySelectorAll(".section.narrow, .service-intro > *, .review, .quote-shell, .contact-layout > *, .portfolio-intro > *, .portfolio-cover > figure, .home-selections > figure, .image-tile")];
+    const covers = [...root.querySelectorAll(".portfolio-cover > figure:not(:first-child)")];
     const disabled = () => reduced.matches || document.body.classList.contains("editing");
 
     const paint = () => {

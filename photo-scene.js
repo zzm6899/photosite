@@ -10,6 +10,7 @@ export function mountPhotoScene(hero, finePointer) {
   const controller = new AbortController();
   const { signal } = controller;
   const scene = new THREE.Scene();
+  const loader = new THREE.TextureLoader();
   const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 10);
   camera.position.z = 3;
   const geometry = new THREE.PlaneGeometry(1, 1);
@@ -66,10 +67,14 @@ export function mountPhotoScene(hero, finePointer) {
     const image = currentImage;
     // Remote editor images retain the DOM fallback; only local images enter WebGL.
     if (new URL(image.src).origin !== location.origin && !image.src.startsWith("data:")) return;
-    try { await image.decode(); } catch { return; }
-    if (signal.aborted || id !== request) return;
+    let nextTexture;
+    try {
+      await image.decode();
+      nextTexture = await loader.loadAsync(image.currentSrc || image.src);
+    } catch { return; }
+    if (signal.aborted || id !== request) { nextTexture.dispose(); return; }
     texture?.dispose();
-    texture = new THREE.Texture(image);
+    texture = nextTexture;
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.needsUpdate = true;
     material.map = texture;

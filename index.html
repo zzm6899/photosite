@@ -6,23 +6,24 @@
     <title>Zac Morgan Photography</title>
     <meta
       name="description"
-      content="Local editable mock of Zac Morgan Photography."
+      content="Wedding, portrait, event, and commercial photography by Zac Morgan. Explore the portfolio and enquire about your next shoot."
     />
-    <link rel="stylesheet" href="/styles.css?v=8" />
+    <link rel="stylesheet" href="/styles.css?v=9" />
   </head>
   <body>
     <header class="site-header" data-header>
       <nav class="nav-shell" aria-label="Main navigation">
         <a class="brand-mark" href="/" data-link aria-label="Zac Morgan Photography">
           <img data-logo alt="Zac Morgan Photography logo" />
-          <span>Zac Morgan Photography</span>
+          <span>Zac Morgan<small>Photography</small></span>
         </a>
-        <div class="nav-links">
+        <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="main-links" title="Open navigation">&#9776;</button>
+        <div class="nav-links" id="main-links">
           <a href="/" data-link>Home</a>
           <a href="/portfolio/" data-link>Portfolio</a>
-          <a href="/events/" data-link>Branding / Events</a>
-          <a href="/testimonials/" data-link>Testimonials</a>
-          <a href="/contact/" data-link>Contact</a>
+          <a href="/events/" data-link>Commercial</a>
+          <a href="/testimonials/" data-link>Kind words</a>
+          <a href="/contact/" class="nav-enquire" data-link>Enquire <span aria-hidden="true">&#8599;</span></a>
         </div>
       </nav>
     </header>
@@ -30,23 +31,19 @@
     <main id="app" tabindex="-1"></main>
 
     <footer class="site-footer">
-      <a href="https://www.instagram.com/zacmphotos/" target="_blank" rel="noreferrer">@zacmphotos</a>
+      <div class="footer-top"><div><a class="footer-brand" href="/" data-link>Zac Morgan</a><p>People. Places. Moments that matter.</p></div><div><a href="mailto:zacmorganphotography@gmail.com">zacmorganphotography@gmail.com</a><br><a href="https://www.instagram.com/zacmphotos/" target="_blank" rel="noreferrer">Instagram @zacmphotos &#8599;</a></div></div>
       <nav aria-label="Footer navigation">
         <a href="/" data-link>Home</a>
         <a href="/portfolio/" data-link>Portfolio</a>
-        <a href="/events/" data-link>Branding / Events</a>
-        <a href="/testimonials/" data-link>Testimonials</a>
+        <a href="/events/" data-link>Commercial</a>
+        <a href="/testimonials/" data-link>Kind words</a>
         <a href="/contact/" data-link>Contact</a>
       </nav>
       <p>© 2026 Zac Morgan Photography</p>
-      <div class="social-row" aria-label="Social links">
-        <a href="https://www.instagram.com/zacmphotos/" target="_blank" rel="noreferrer">Instagram</a>
-        <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer">LinkedIn</a>
-      </div>
     </footer>
 
     <button class="edit-toggle" type="button" data-edit-toggle>Edit Site</button>
-    <aside class="editor-panel" data-editor aria-label="Site editor">
+    <aside class="editor-panel" data-editor aria-label="Site editor" inert>
       <div class="editor-heading">
         <div>
           <p>Local Editor</p>
@@ -113,7 +110,8 @@
     </aside>
 
     <script src="/assets/site/assets.js?v=1"></script>
-    <script src="/motion.js?v=1"></script>
-    <script src="/app.js?v=8"></script>
+    <script src="/assets/site/dimensions.js?v=1"></script>
+    <script src="/motion.js?v=2"></script>
+    <script src="/app.js?v=9"></script>
   </body>
 </html>
