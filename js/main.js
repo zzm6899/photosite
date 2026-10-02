@@ -1,153 +1,189 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Mobile nav toggle
-  const toggle = document.querySelector('.nav-toggle');
-  const links = document.querySelector('.nav-links');
-  if (toggle && links) {
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.addEventListener('click', () => {
-      const isOpen = links.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', String(isOpen));
+  const menuButton = document.querySelector('.nav-toggle');
+  const menu = document.getElementById('primary-navigation');
+  if (menuButton && menu) {
+    const setMenu = (open) => {
+      menu.classList.toggle('open', open);
+      menuButton.setAttribute('aria-expanded', String(open));
+      menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    };
+    menuButton.addEventListener('click', () => setMenu(menuButton.getAttribute('aria-expanded') !== 'true'));
+    menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setMenu(false)));
+    document.addEventListener('click', (event) => {
+      if (!menuButton.contains(event.target) && !menu.contains(event.target)) setMenu(false);
     });
-    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-      links.classList.remove('open');
-      toggle.setAttribute('aria-expanded', 'false');
-    }));
-    // Close nav when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!toggle.contains(e.target) && !links.contains(e.target)) {
-        links.classList.remove('open');
-        toggle.setAttribute('aria-expanded', 'false');
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') setMenu(false); });
+  }
+
+  document.querySelectorAll('[data-filter-controls]').forEach((controls) => {
+    const buttons = Array.from(controls.querySelectorAll('[data-filter]'));
+    const section = controls.closest('.gallery-section');
+    const items = Array.from((section || document).querySelectorAll('[data-filter-item]'));
+    const count = (section || document).querySelector('[data-gallery-count]');
+    if (!buttons.length || !items.length) return;
+    const canonical = new Map(buttons.map((button) => [button.dataset.filter.toLowerCase(), button.dataset.filter]));
+    const aliases = {
+      'brand and business': 'Brand & Corporate',
+      'brand and corporate': 'Brand & Corporate',
+      corporate: 'Brand & Corporate',
+      business: 'Brand & Corporate',
+      'event and hospitality': 'Events & Hospitality',
+      events: 'Events & Hospitality',
+      event: 'Events & Hospitality',
+      hospitality: 'Events & Hospitality',
+      weddings: 'Weddings & Celebrations',
+      wedding: 'Weddings & Celebrations',
+      'cosplay & character': 'Portraits',
+      'cosplay and character': 'Portraits',
+      'live performance': 'Events & Hospitality',
+      selected: 'all'
+    };
+    const resolve = (raw) => {
+      if (!raw || ['all', 'all work'].includes(raw.toLowerCase())) return 'all';
+      const key = raw.trim().toLowerCase().replace(/\s+/g, ' ');
+      const mapped = aliases[key] || raw.trim();
+      return canonical.get(mapped.toLowerCase()) || 'all';
+    };
+    const apply = (filter, updateUrl, replaceUrl) => {
+      const visible = items.filter((item) => filter === 'all' || (item.dataset.categories || '').toLowerCase().split(',').map((part) => part.trim()).includes(filter.toLowerCase()));
+      items.forEach((item) => { item.hidden = !visible.includes(item); });
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.filter === filter)));
+      if (count) count.textContent = visible.length + (visible.length === 1 ? ' photograph' : ' photographs');
+      if (updateUrl || replaceUrl) {
+        const url = new URL(window.location.href);
+        if (filter === 'all') url.searchParams.delete('category');
+        else url.searchParams.set('category', filter);
+        const next = url.pathname + url.search + url.hash;
+        if (updateUrl) window.history.pushState({ category: filter }, '', next);
+        else if (window.location.pathname + window.location.search + window.location.hash !== next) window.history.replaceState({ category: filter }, '', next);
       }
-    });
-  }
+    };
+    const params = new URLSearchParams(window.location.search);
+    apply(resolve(params.get('category')), false, true);
+    buttons.forEach((button) => button.addEventListener('click', () => {
+      const active = buttons.find((candidate) => candidate.getAttribute('aria-pressed') === 'true');
+      if (button.dataset.filter !== active?.dataset.filter) apply(button.dataset.filter, true, false);
+    }));
+    window.addEventListener('popstate', () => apply(resolve(new URLSearchParams(window.location.search).get('category')), false, false));
+  });
 
-  // Scroll nav background
-  const nav = document.getElementById('main-nav');
-  if (nav) {
-    window.addEventListener('scroll', () => {
-      nav.style.background = window.scrollY > 50 ? 'rgba(13,13,13,0.98)' : 'rgba(13,13,13,0.92)';
-    });
-  }
-
-  // Fade in on scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-  // Lightbox
+  const galleryImages = Array.from(document.querySelectorAll('[data-lightbox-item]'));
   const lightbox = document.querySelector('.lightbox');
-  if (lightbox) {
-    const lbImg = lightbox.querySelector('.lightbox-img');
-    const imgs = Array.from(document.querySelectorAll('.masonry-item img'));
-    let idx = 0;
-    let previouslyFocused = null;
-
-    const focusableInLightbox = () => Array.from(lightbox.querySelectorAll('button'));
-
-    const show = (i) => {
-      previouslyFocused = document.activeElement;
-      idx = i;
-      lbImg.src = imgs[i].src;
-      lbImg.alt = imgs[i].alt || 'Portfolio image';
+  if (lightbox && galleryImages.length) {
+    const image = lightbox.querySelector('.lightbox-img');
+    const closeButton = lightbox.querySelector('.lightbox-close');
+    let index = 0;
+    let returnFocus = null;
+    const isOpen = () => lightbox.classList.contains('active');
+    const visibleImages = () => galleryImages.filter((item) => !item.closest('[data-filter-item]')?.hidden);
+    const show = (nextIndex) => {
+      const available = visibleImages();
+      if (!available.length) return;
+      const wasOpen = isOpen();
+      if (!wasOpen) returnFocus = document.activeElement;
+      index = (nextIndex + available.length) % available.length;
+      image.src = available[index].currentSrc || available[index].src;
+      image.alt = available[index].alt || 'Portfolio photograph';
       lightbox.classList.add('active');
+      lightbox.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
-      // Move focus to close button when lightbox opens
-      requestAnimationFrame(() => {
-        const closeBtn = lightbox.querySelector('.lightbox-close');
-        if (closeBtn) closeBtn.focus();
-      });
+      if (!wasOpen) closeButton.focus();
     };
-
     const hide = () => {
+      if (!isOpen()) return;
       lightbox.classList.remove('active');
+      lightbox.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
-      // Restore focus to the element that triggered the lightbox
-      if (previouslyFocused) previouslyFocused.focus();
+      if (returnFocus && returnFocus.isConnected) returnFocus.focus({ preventScroll: true });
+      returnFocus = null;
     };
-
-    imgs.forEach((img, i) => {
-      img.addEventListener('click', () => show(i));
-      // Make images keyboard-accessible
-      img.setAttribute('tabindex', '0');
-      img.setAttribute('role', 'button');
-      img.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(i); }
+    galleryImages.forEach((item) => {
+      item.tabIndex = 0;
+      item.setAttribute('role', 'button');
+      item.setAttribute('aria-haspopup', 'dialog');
+      item.addEventListener('click', () => show(visibleImages().indexOf(item)));
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); show(visibleImages().indexOf(item)); }
       });
     });
-
-    lightbox.querySelector('.lightbox-close')?.addEventListener('click', hide);
-    lightbox.querySelector('.lightbox-prev')?.addEventListener('click', () => show((idx - 1 + imgs.length) % imgs.length));
-    lightbox.querySelector('.lightbox-next')?.addEventListener('click', () => show((idx + 1) % imgs.length));
-    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) hide(); });
-
-    document.addEventListener('keydown', (e) => {
-      if (!lightbox.classList.contains('active')) return;
-      if (e.key === 'Escape') hide();
-      if (e.key === 'ArrowLeft') show((idx - 1 + imgs.length) % imgs.length);
-      if (e.key === 'ArrowRight') show((idx + 1) % imgs.length);
+    closeButton.addEventListener('click', hide);
+    lightbox.querySelector('.lightbox-prev').addEventListener('click', () => show(index - 1));
+    lightbox.querySelector('.lightbox-next').addEventListener('click', () => show(index + 1));
+    lightbox.addEventListener('click', (event) => { if (event.target === lightbox) hide(); });
+    document.addEventListener('keydown', (event) => {
+      if (!isOpen()) return;
+      if (event.key === 'Escape') { event.preventDefault(); hide(); }
+      if (event.key === 'ArrowLeft') { event.preventDefault(); show(index - 1); }
+      if (event.key === 'ArrowRight') { event.preventDefault(); show(index + 1); }
     });
-
-    // Focus trap inside lightbox
-    lightbox.addEventListener('keydown', (e) => {
-      if (e.key !== 'Tab') return;
-      const focusable = focusableInLightbox();
-      if (!focusable.length) return;
+    lightbox.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab') return;
+      const focusable = Array.from(lightbox.querySelectorAll('button'));
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-      } else {
-        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     });
   }
 
-  // Contact form validation
   const form = document.getElementById('enquiry-form');
   const status = document.getElementById('form-status');
   if (form && status) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const name = form.querySelector('[name="name"]');
-      const email = form.querySelector('[name="email"]');
-      const phone = form.querySelector('[name="phone"]');
-      const session = form.querySelector('[name="session"]:checked');
-      const date = form.querySelector('[name="date"]');
-      const location = form.querySelector('[name="location"]');
-      const message = form.querySelector('[name="message"]');
-
-      // Validate required fields
-      const missing = [
-        name && !name.value.trim() && 'Name',
-        email && !email.value.trim() && 'Email',
-        phone && !phone.value.trim() && 'Phone number',
-        !session && 'Session type',
-        date && !date.value && 'Event date',
-        location && !location.value.trim() && 'Event location',
-        message && !message.value.trim() && 'Message',
-      ].filter(Boolean);
-
-      if (missing.length) {
-        status.textContent = `Please fill in: ${missing.join(', ')}.`;
-        status.className = 'form-status error';
-        status.focus();
-        return;
+    const email = 'zacmorganphotography@gmail.com';
+    const submit = form.querySelector('[type="submit"]');
+    const initialButtonText = submit.textContent;
+    const showStatus = (kind, text, withEmailLink) => {
+      status.replaceChildren();
+      status.append(document.createTextNode(text));
+      if (withEmailLink) {
+        const link = document.createElement('a');
+        link.href = 'mailto:' + email + '?subject=Photography%20enquiry';
+        link.textContent = email;
+        status.append(link);
       }
-
-      // Basic email format check
-      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-        status.textContent = 'Please enter a valid email address.';
-        status.className = 'form-status error';
-        status.focus();
-        return;
-      }
-
-      status.textContent = 'Message sent! Zac will get back to you soon.';
-      status.className = 'form-status success';
+      status.className = 'form-status ' + kind;
+      status.hidden = false;
       status.focus();
-      form.reset();
+    };
+    const requestedSession = new URLSearchParams(window.location.search).get('session');
+    if (requestedSession) {
+      const matchingRadio = Array.from(form.querySelectorAll('[name="session"]')).find((radio) => radio.value.toLowerCase() === requestedSession.toLowerCase());
+      if (matchingRadio) matchingRadio.checked = true;
+    }
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      status.hidden = true;
+      if (!form.reportValidity()) return;
+      const values = Object.fromEntries(new FormData(form).entries());
+      const payload = {
+        name: values.name.trim(),
+        email: values.email.trim(),
+        phone: values.phone.trim(),
+        session: values.session,
+        date: values.date,
+        location: values.location.trim(),
+        message: values.message.trim(),
+        source: values.source || 'Website'
+      };
+      submit.disabled = true;
+      submit.textContent = 'Sending enquiry…';
+      form.setAttribute('aria-busy', 'true');
+      try {
+        const response = await fetch('https://book.zacmclients.photos/api/enquiry', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error('Enquiry endpoint returned ' + response.status);
+        form.reset();
+        showStatus('success', 'Thanks — your enquiry has been sent.', false);
+      } catch (error) {
+        showStatus('error', 'The form could not send your enquiry. Email Zac directly at ', true);
+      } finally {
+        submit.disabled = false;
+        submit.textContent = initialButtonText;
+        form.removeAttribute('aria-busy');
+      }
     });
   }
 });
